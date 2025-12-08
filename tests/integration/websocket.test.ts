@@ -1,7 +1,7 @@
-import { createApp } from '../src/app';
+import { createApp } from '../../src/app';
 import { FastifyInstance } from 'fastify';
 import WebSocket from 'ws';
-import { TranscriptionModel } from '../src/models/transcription.model';
+import { TranscriptionModel } from '../../src/models/transcription.model';
 
 describe('WebSocket Transcription Stream', () => {
   let app: FastifyInstance;

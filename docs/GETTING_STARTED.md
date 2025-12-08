@@ -235,13 +235,14 @@ AudioFlow/
 
 Now that you have AudioFlow running:
 
-1. **Try the API**: Test all endpoints using curl or Postman
-2. **Check the Logs**: Watch the console for detailed logging
-3. **Monitor MongoDB**: View your data in MongoDB Atlas
-4. **Add Azure**: Configure Azure Speech for real transcription
-5. **Test WebSocket**: Try the streaming transcription endpoint
-6. **Learn the Architecture**: See [ARCHITECTURE.md](ARCHITECTURE.md) for design patterns
-7. **Review Implementation**: See [PROJECT_SUMMARY.md](PROJECT_SUMMARY.md) for details
+1. **View API Documentation**: Open http://localhost:3000/docs for interactive Swagger UI
+2. **Try the API**: Test all endpoints using curl, Postman, or Swagger UI
+3. **Check the Logs**: Watch the console for detailed logging
+4. **Monitor MongoDB**: View your data in MongoDB Atlas
+5. **Add Azure**: Configure Azure Speech for real transcription
+6. **Test WebSocket**: Try the streaming transcription endpoint
+7. **Learn the Architecture**: See [ARCHITECTURE.md](ARCHITECTURE.md) for design patterns
+8. **Review Implementation**: See [PROJECT_SUMMARY.md](PROJECT_SUMMARY.md) for details
 
 ## Available NPM Scripts
 

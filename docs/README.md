@@ -56,10 +56,26 @@ This summary includes:
 
 ---
 
+### 4. [SWAGGER_GUIDE.md](SWAGGER_GUIDE.md)
+
+**Interactive API documentation and testing**
+
+This guide covers:
+
+- Accessing Swagger UI at `/docs`
+- Interactive API testing without code
+- Complete endpoint documentation
+- Schema definitions and examples
+- Troubleshooting and best practices
+
+**Recommended for:** Developers who want to test APIs interactively and explore endpoint documentation visually.
+
+---
+
 ## 🚀 Quick Links
 
 - **Main README**: [../README.md](../README.md) - Project overview, indexing strategy, scalability design
-- **Getting Started**: [GETTING_STARTED.md](GETTING_STARTED.md) - Setup instructions
+- **Getting Started**: [GETTING_STARTED.md](GETTING_STARTED.md) - Setup instructions & Swagger UI access
 - **Architecture**: [ARCHITECTURE.md](ARCHITECTURE.md) - Design patterns
 - **Summary**: [PROJECT_SUMMARY.md](PROJECT_SUMMARY.md) - Implementation details
 
@@ -88,12 +104,27 @@ This summary includes:
 
 ## 🔧 API Documentation
 
-The project uses **TypeScript interfaces** for type safety. API documentation will be provided via **Swagger/OpenAPI** in future releases.
+The project uses **Swagger/OpenAPI** for interactive API documentation!
 
-For now, you can:
+**Access Swagger UI:**
+
+```
+http://localhost:3000/docs
+```
+
+Features:
+
+- ✅ Interactive endpoint testing
+- ✅ Complete schema documentation
+- ✅ Request/response examples
+- ✅ No code required!
+
+For detailed Swagger usage, see [SWAGGER_GUIDE.md](SWAGGER_GUIDE.md).
+
+You can also:
 
 - Check the `src/routes/` folder for endpoint definitions
-- Review `src/types/index.ts` for request/response types
+- Review `src/types/index.ts` for TypeScript types
 - Look at `tests/` folder for usage examples
 
 ## ❓ Need Help?

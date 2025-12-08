@@ -16,6 +16,7 @@ export const transcriptionsQuerySchema = z.object({
   days: z.preprocess((val) => (val ? Number(val) : 30), z.number().default(30)),
   page: z.preprocess((val) => (val ? Number(val) : 1), z.number().default(1)),
   limit: z.preprocess((val) => (val ? Number(val) : 10), z.number().default(10)),
+  source: z.enum(['mock', 'azure']).optional(),
 });
 
 /**

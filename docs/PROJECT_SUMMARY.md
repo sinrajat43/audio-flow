@@ -393,7 +393,7 @@ AudioFlow/
    - Running tests
    - Troubleshooting
 
-**Note:** API documentation will be provided via Swagger/OpenAPI in the future.
+**Note:** Interactive API documentation is available via Swagger UI at `/docs` endpoint when the server is running.
 
 ---
 

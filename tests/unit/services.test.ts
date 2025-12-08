@@ -1,7 +1,7 @@
-import { audioService } from '../src/services/audio.service';
-import { transcriptionService } from '../src/services/transcription.service';
-import { retryWithBackoff, isValidUrl, getFilenameFromUrl } from '../src/utils/retry';
-import { TranscriptionModel } from '../src/models/transcription.model';
+import { audioService } from '../../src/services/audio.service';
+import { transcriptionService } from '../../src/services/transcription.service';
+import { retryWithBackoff, isValidUrl, getFilenameFromUrl } from '../../src/utils/retry';
+import { TranscriptionModel } from '../../src/models/transcription.model';
 
 describe('Audio Service', () => {
   describe('mockDownload', () => {

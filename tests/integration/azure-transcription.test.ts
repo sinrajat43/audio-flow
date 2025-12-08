@@ -1,6 +1,6 @@
-import { createApp } from '../src/app';
+import { createApp } from '../../src/app';
 import { FastifyInstance } from 'fastify';
-import { TranscriptionModel } from '../src/models/transcription.model';
+import { TranscriptionModel } from '../../src/models/transcription.model';
 
 describe('Azure Transcription API', () => {
   let app: FastifyInstance;

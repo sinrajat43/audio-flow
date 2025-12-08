@@ -26,5 +26,30 @@ module.exports = {
       lines: 70,
     },
   },
+  // Test organization with projects
+  projects: [
+    {
+      displayName: 'unit',
+      preset: 'ts-jest',
+      testEnvironment: 'node',
+      testMatch: ['<rootDir>/tests/unit/**/*.test.ts'],
+      setupFilesAfterEnv: ['<rootDir>/tests/setup.ts'],
+      moduleFileExtensions: ['ts', 'js', 'json'],
+      transform: {
+        '^.+\\.ts$': 'ts-jest',
+      },
+    },
+    {
+      displayName: 'integration',
+      preset: 'ts-jest',
+      testEnvironment: 'node',
+      testMatch: ['<rootDir>/tests/integration/**/*.test.ts'],
+      setupFilesAfterEnv: ['<rootDir>/tests/setup.ts'],
+      moduleFileExtensions: ['ts', 'js', 'json'],
+      transform: {
+        '^.+\\.ts$': 'ts-jest',
+      },
+    },
+  ],
 };
 
