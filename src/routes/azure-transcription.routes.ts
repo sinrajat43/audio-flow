@@ -1,9 +1,6 @@
 import { FastifyInstance } from 'fastify';
 import { azureTranscriptionController } from '../controllers/azure-transcription.controller';
-import {
-  validateBody,
-  azureTranscriptionRequestSchema,
-} from '../middleware/validation';
+import { validateBody, azureTranscriptionRequestSchema } from '../middleware/validation';
 
 /**
  * Azure transcription routes
@@ -88,4 +85,3 @@ export async function azureTranscriptionRoutes(fastify: FastifyInstance): Promis
     azureTranscriptionController.createAzureTranscription.bind(azureTranscriptionController) as any,
   );
 }
-

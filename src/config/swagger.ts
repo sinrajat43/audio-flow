@@ -112,4 +112,3 @@ export const swaggerUiOptions: FastifySwaggerUiOptions = {
   staticCSP: true,
   transformStaticCSP: (header) => header,
 };
-

@@ -23,4 +23,3 @@ export interface ISpeechClient {
    */
   transcribe(audioData: Buffer, language: LanguageCode): Promise<SpeechRecognitionResult>;
 }
-

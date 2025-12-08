@@ -34,22 +34,26 @@ A production-ready audio transcription service with mock and Azure Speech-to-Tex
 ## Installation
 
 1. Clone the repository:
+
 ```bash
 git clone <repository-url>
 cd AudioFlow
 ```
 
 2. Install dependencies:
+
 ```bash
 npm install
 ```
 
 3. Create environment file:
+
 ```bash
 cp .env.example .env
 ```
 
 4. Configure environment variables in `.env`:
+
 ```env
 NODE_ENV=development
 PORT=3000
@@ -71,22 +75,26 @@ RETRY_MAX_DELAY=10000
 ## Running the Application
 
 ### Development Mode
+
 ```bash
 npm run dev
 ```
 
 ### Production Mode
+
 ```bash
 npm run build
 npm start
 ```
 
 ### Running Tests
+
 ```bash
 npm test
 ```
 
 ### Linting
+
 ```bash
 npm run lint
 npm run lint:fix
@@ -94,239 +102,21 @@ npm run lint:fix
 
 ## API Documentation
 
-### Base URL
+### 🎯 Interactive API Documentation (Swagger UI)
+
+**Access the full interactive API documentation at:**
+
 ```
-http://localhost:3000
-```
-
-### Endpoints
-
-#### 1. Health Check
-**GET** `/health`
-
-Returns the health status of the service.
-
-**Response:**
-```json
-{
-  "status": "healthy",
-  "timestamp": "2025-12-08T10:30:00.000Z",
-  "uptime": 1234.56,
-  "environment": "development",
-  "azure": {
-    "configured": true
-  }
-}
+http://localhost:3000/docs
 ```
 
----
+**Swagger UI provides:**
 
-#### 2. Create Mock Transcription
-**POST** `/transcription`
-
-Creates a mock transcription from an audio URL.
-
-**Request Body:**
-```json
-{
-  "audioUrl": "https://example.com/sample.mp3"
-}
-```
-
-**Response (201 Created):**
-```json
-{
-  "id": "507f1f77bcf86cd799439011",
-  "audioUrl": "https://example.com/sample.mp3",
-  "transcription": "This is a mock transcription of the audio file...",
-  "source": "mock",
-  "createdAt": "2025-12-08T10:30:00.000Z"
-}
-```
-
-**Features:**
-- Validates URL format
-- Simulates audio download with retry logic (3 attempts)
-- Generates mock transcription text
-- Saves to MongoDB
-
----
-
-#### 3. Get Recent Transcriptions
-**GET** `/transcriptions`
-
-Fetches transcriptions created in the last N days with pagination.
-
-**Query Parameters:**
-- `days` (number, default: 30) - Number of days to look back
-- `page` (number, default: 1) - Page number for pagination
-- `limit` (number, default: 10) - Results per page
-- `source` (string, optional) - Filter by source ('mock' or 'azure')
-
-**Example Request:**
-```
-GET /transcriptions?days=30&page=1&limit=10&source=azure
-```
-
-**Response (200 OK):**
-```json
-{
-  "count": 150,
-  "page": 1,
-  "limit": 10,
-  "totalPages": 15,
-  "transcriptions": [
-    {
-      "id": "507f1f77bcf86cd799439011",
-      "audioUrl": "https://example.com/sample.mp3",
-      "transcription": "Transcribed text...",
-      "source": "azure",
-      "language": "en-US",
-      "createdAt": "2025-12-08T10:30:00.000Z"
-    }
-  ]
-}
-```
-
----
-
-#### 4. Create Azure Transcription
-**POST** `/azure-transcription`
-
-Creates a transcription using Azure Speech-to-Text or mock fallback.
-
-**Request Body:**
-```json
-{
-  "audioUrl": "https://example.com/sample.mp3",
-  "language": "en-US"
-}
-```
-
-**Supported Languages:**
-- `en-US` - English (United States)
-- `fr-FR` - French (France)
-- `es-ES` - Spanish (Spain)
-- `de-DE` - German (Germany)
-- `it-IT` - Italian (Italy)
-- `ja-JP` - Japanese (Japan)
-- `ko-KR` - Korean (Korea)
-
-**Response (201 Created):**
-```json
-{
-  "id": "507f1f77bcf86cd799439012",
-  "audioUrl": "https://example.com/sample.mp3",
-  "transcription": "Actual transcribed text from Azure...",
-  "source": "azure",
-  "language": "en-US",
-  "createdAt": "2025-12-08T10:30:00.000Z"
-}
-```
-
-**Features:**
-- Auto-detects if Azure credentials are configured
-- Falls back to mock implementation if Azure unavailable
-- Retry with exponential backoff (3 attempts)
-- Graceful error handling
-
----
-
-#### 5. WebSocket Streaming Transcription
-**WS** `/ws/transcription`
-
-Real-time streaming transcription endpoint.
-
-**Client Message Format:**
-```json
-{
-  "type": "chunk",
-  "data": "<base64-encoded-audio-chunk>",
-  "isLast": false
-}
-```
-
-**Server Response - Partial Results:**
-```json
-{
-  "type": "partial",
-  "text": "This is partial transcription...",
-  "confidence": 0.85
-}
-```
-
-**Server Response - Final Result:**
-```json
-{
-  "type": "final",
-  "text": "Complete transcription text...",
-  "id": "507f1f77bcf86cd799439013"
-}
-```
-
-**Server Response - Error:**
-```json
-{
-  "type": "error",
-  "message": "Error description",
-  "code": "ERROR_CODE"
-}
-```
-
-**Example Usage (JavaScript):**
-```javascript
-const ws = new WebSocket('ws://localhost:3000/ws/transcription');
-
-ws.onopen = () => {
-  // Send audio chunks
-  ws.send(JSON.stringify({
-    type: 'chunk',
-    data: btoa('audio-data-1'),
-    isLast: false
-  }));
-  
-  ws.send(JSON.stringify({
-    type: 'chunk',
-    data: btoa('audio-data-2'),
-    isLast: true
-  }));
-};
-
-ws.onmessage = (event) => {
-  const message = JSON.parse(event.data);
-  
-  if (message.type === 'partial') {
-    console.log('Partial:', message.text, message.confidence);
-  } else if (message.type === 'final') {
-    console.log('Final:', message.text, message.id);
-  }
-};
-```
-
----
-
-### Error Response Format
-
-All errors follow a consistent format:
-
-```json
-{
-  "error": {
-    "code": "VALIDATION_ERROR",
-    "message": "The provided audio URL is invalid",
-    "statusCode": 400,
-    "details": {}
-  }
-}
-```
-
-**Common Error Codes:**
-- `VALIDATION_ERROR` (400) - Invalid request data
-- `INVALID_URL` (400) - Malformed URL
-- `NOT_FOUND` (404) - Resource not found
-- `DOWNLOAD_ERROR` (500) - Failed to download audio
-- `AZURE_ERROR` (503) - Azure service unavailable
-- `INTERNAL_ERROR` (500) - Unexpected server error
+- ✅ **Complete endpoint documentation** - All REST and WebSocket endpoints
+- ✅ **Interactive testing** - Test APIs directly in your browser
+- ✅ **Request/response schemas** - Full schema definitions with examples
+- ✅ **Error codes & formats** - Detailed error documentation
+- ✅ **No code required** - Visual interface for all API operations
 
 ---
 
@@ -368,19 +158,22 @@ For a dataset with 100M+ records, our indexing strategy provides:
 5. **TTL Index**: For automatic cleanup of old records, add a TTL index:
    ```javascript
    db.transcriptions.createIndex(
-     { "createdAt": 1 },
-     { expireAfterSeconds: 7776000 } // 90 days
-   )
+     { createdAt: 1 },
+     { expireAfterSeconds: 7776000 }, // 90 days
+   );
    ```
 
 ### Query Performance Example
 
 ```javascript
 // Efficient query using compound index
-db.transcriptions.find({
-  createdAt: { $gte: new Date('2025-11-08') },
-  source: 'azure'
-}).sort({ createdAt: -1 }).limit(10)
+db.transcriptions
+  .find({
+    createdAt: { $gte: new Date('2025-11-08') },
+    source: 'azure',
+  })
+  .sort({ createdAt: -1 })
+  .limit(10);
 
 // This query will:
 // 1. Use the compound index for filtering and sorting
@@ -415,6 +208,7 @@ To scale the service to handle 10,000+ concurrent requests, here are the key imp
 ```
 
 **Implementation:**
+
 - Deploy in Docker containers with Kubernetes
 - Use Horizontal Pod Autoscaler (HPA) based on CPU/memory metrics
 - Target: 70% CPU utilization per pod
@@ -430,26 +224,25 @@ API Server → Bull/BullMQ → Redis → Worker Pool → Azure/Storage
 ```
 
 **Benefits:**
+
 - Prevents API timeout on slow transcriptions
 - Retry failed jobs automatically
 - Handle traffic spikes by queuing requests
 - Monitor job progress and failures
 
 **Implementation:**
+
 ```javascript
 // API endpoint queues the job
 await transcriptionQueue.add('transcribe', {
   audioUrl,
   language,
-  userId
+  userId,
 });
 
 // Workers process jobs in background
 transcriptionQueue.process('transcribe', async (job) => {
-  const result = await azureSpeechService.transcribeAudio(
-    job.data.audioUrl,
-    job.data.language
-  );
+  const result = await azureSpeechService.transcribeAudio(job.data.audioUrl, job.data.language);
   return result;
 });
 ```
@@ -460,11 +253,13 @@ transcriptionQueue.process('transcribe', async (job) => {
 **Scaled**: Multi-tier caching
 
 **Cache Strategy:**
+
 - **L1 (In-Memory)**: Recent transcription results (5 min TTL)
 - **L2 (Redis)**: Frequently accessed transcriptions (1 hour TTL)
 - **L3 (MongoDB)**: Persistent storage
 
 **Implementation:**
+
 ```javascript
 // Check cache before database
 const cached = await redis.get(`transcription:${id}`);
@@ -476,6 +271,7 @@ await redis.setex(`transcription:${id}`, 3600, JSON.stringify(result));
 ```
 
 **Cache Invalidation:**
+
 - Write-through: Update cache on new transcriptions
 - TTL-based expiration
 - Event-driven invalidation on updates
@@ -483,45 +279,50 @@ await redis.setex(`transcription:${id}`, 3600, JSON.stringify(result));
 #### 4. Database Optimization
 
 **Read Replicas:**
+
 - Primary: Write operations
 - Replicas: Read operations (transcription list)
 - Distribute read load across 2-3 replicas
 
 **Connection Pooling:**
+
 ```javascript
 mongoose.connect(uri, {
-  maxPoolSize: 50,  // Increased from 10
+  maxPoolSize: 50, // Increased from 10
   minPoolSize: 10,
-  socketTimeoutMS: 45000
+  socketTimeoutMS: 45000,
 });
 ```
 
 **Sharding Strategy:**
+
 ```javascript
 // Shard by createdAt ranges
-sh.shardCollection("audioflow.transcriptions", {
-  "createdAt": "hashed"
-})
+sh.shardCollection('audioflow.transcriptions', {
+  createdAt: 'hashed',
+});
 ```
 
 #### 5. Rate Limiting & Circuit Breaker
 
 **Rate Limiting:**
+
 ```javascript
 // Per-client rate limit: 100 req/min
 fastify.register(require('@fastify/rate-limit'), {
   max: 100,
-  timeWindow: '1 minute'
-})
+  timeWindow: '1 minute',
+});
 ```
 
 **Circuit Breaker for Azure:**
+
 ```javascript
 // Prevent cascading failures
 const breaker = new CircuitBreaker(azureTranscribe, {
   timeout: 30000,
   errorThresholdPercentage: 50,
-  resetTimeout: 30000
+  resetTimeout: 30000,
 });
 ```
 
@@ -534,12 +335,14 @@ const breaker = new CircuitBreaker(azureTranscribe, {
 #### 7. Monitoring & Observability
 
 **Metrics:**
+
 - Request rate, latency (p50, p95, p99)
 - Error rate by endpoint
 - Queue depth and processing time
 - Database connection pool utilization
 
 **Tools:**
+
 - Prometheus + Grafana for metrics
 - ELK Stack for log aggregation
 - Sentry for error tracking
@@ -549,13 +352,13 @@ const breaker = new CircuitBreaker(azureTranscribe, {
 
 With these optimizations:
 
-| Metric | Before | After |
-|--------|--------|-------|
-| Concurrent Requests | ~100 | 10,000+ |
-| Response Time (p95) | 500ms | 200ms |
-| Throughput | 100 req/s | 2,000+ req/s |
-| Database Load | High | Distributed |
-| Availability | 95% | 99.9% |
+| Metric              | Before    | After        |
+| ------------------- | --------- | ------------ |
+| Concurrent Requests | ~100      | 10,000+      |
+| Response Time (p95) | 500ms     | 200ms        |
+| Throughput          | 100 req/s | 2,000+ req/s |
+| Database Load       | High      | Distributed  |
+| Availability        | 95%       | 99.9%        |
 
 ---
 
@@ -703,16 +506,16 @@ spec:
         app: audioflow
     spec:
       containers:
-      - name: audioflow
-        image: audioflow:latest
-        ports:
-        - containerPort: 3000
-        env:
-        - name: MONGODB_URI
-          valueFrom:
-            secretKeyRef:
-              name: audioflow-secrets
-              key: mongodb-uri
+        - name: audioflow
+          image: audioflow:latest
+          ports:
+            - containerPort: 3000
+          env:
+            - name: MONGODB_URI
+              valueFrom:
+                secretKeyRef:
+                  name: audioflow-secrets
+                  key: mongodb-uri
 ```
 
 ---
@@ -743,6 +546,7 @@ For issues, questions, or contributions, please open an issue on GitHub.
 ## Changelog
 
 ### v1.0.0 (2025-12-08)
+
 - Initial release
 - Mock transcription endpoint
 - Azure Speech-to-Text integration
@@ -750,4 +554,3 @@ For issues, questions, or contributions, please open an issue on GitHub.
 - Comprehensive test suite
 - MongoDB indexing optimization
 - Scalability documentation
-
