@@ -20,6 +20,7 @@ npm install
 ```
 
 This will install:
+
 - Fastify (web framework)
 - Mongoose (MongoDB ODM)
 - TypeScript and related tools
@@ -90,6 +91,7 @@ RETRY_MAX_DELAY=10000
 ```
 
 ### Important:
+
 - **MONGODB_URI** is required - the app won't start without it
 - **Azure credentials** are optional - the app will use mock transcription if not provided
 
@@ -145,6 +147,7 @@ curl http://localhost:3000/health
 ```
 
 You should see:
+
 ```json
 {
   "status": "healthy",
@@ -192,6 +195,7 @@ All tests should pass. The tests use an in-memory MongoDB (MongoMemoryServer), s
 ### Error: "Connection failed" or "ECONNREFUSED"
 
 **Solutions:**
+
 1. Check your MongoDB Atlas connection string is correct
 2. Verify your IP address is whitelisted in Atlas Network Access
 3. Check your database username and password are correct
@@ -203,6 +207,7 @@ All tests should pass. The tests use an in-memory MongoDB (MongoMemoryServer), s
 ### Tests failing
 
 **Solutions:**
+
 1. Make sure you've run `npm install`
 2. Check that port 3000 (or test port) is not already in use
 3. Try `npm test -- --forceExit` if tests hang
@@ -235,7 +240,8 @@ Now that you have AudioFlow running:
 3. **Monitor MongoDB**: View your data in MongoDB Atlas
 4. **Add Azure**: Configure Azure Speech for real transcription
 5. **Test WebSocket**: Try the streaming transcription endpoint
-6. **Read the README**: See [README.md](README.md) for full API documentation
+6. **Learn the Architecture**: See [ARCHITECTURE.md](ARCHITECTURE.md) for design patterns
+7. **Review Implementation**: See [PROJECT_SUMMARY.md](PROJECT_SUMMARY.md) for details
 
 ## Available NPM Scripts
 
@@ -251,7 +257,9 @@ npm run format     # Format code with Prettier
 
 ## Getting Help
 
-- Check the [README.md](README.md) for API documentation
+- Check the [README.md](../README.md) for project overview
+- Review [ARCHITECTURE.md](ARCHITECTURE.md) for design patterns
+- Check [PROJECT_SUMMARY.md](PROJECT_SUMMARY.md) for implementation details
 - Review the code examples in `tests/` folder
 - Check MongoDB Atlas documentation for database issues
 - Review Azure Speech SDK documentation for transcription issues
@@ -267,4 +275,3 @@ npm run format     # Format code with Prettier
 - [ ] Tests pass (`npm test`)
 
 Congratulations! You're ready to use AudioFlow. 🎉
-

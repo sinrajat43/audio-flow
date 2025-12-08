@@ -11,9 +11,11 @@ import { sleep } from '../utils/retry';
  * Accepts audio chunks and streams back partial/final transcription results
  */
 export async function transcriptionWebSocket(
-  connection: { socket: WebSocket },
+  connection: WebSocket,
   request: FastifyRequest,
 ): Promise<void> {
+  // Wrap WebSocket in object for consistent interface
+  const socket = connection;
   const sessionId = uuidv4();
   const startTime = new Date();
   let chunkCount = 0;
@@ -31,7 +33,7 @@ export async function transcriptionWebSocket(
     text: 'Connected. Ready to receive audio chunks.',
     confidence: 1.0,
   };
-  connection.socket.send(JSON.stringify(welcomeMessage));
+  socket.send(JSON.stringify(welcomeMessage));
 
   /**
    * Generate mock partial transcription from accumulated chunks
@@ -92,7 +94,7 @@ export async function transcriptionWebSocket(
           confidence: parseFloat(confidence.toFixed(2)),
         };
 
-        connection.socket.send(JSON.stringify(partialMessage));
+        socket.send(JSON.stringify(partialMessage));
 
         logInfo('Sent partial transcription', {
           sessionId,
@@ -110,7 +112,7 @@ export async function transcriptionWebSocket(
   };
 
   // Handle incoming messages
-  connection.socket.on('message', async (message: Buffer) => {
+  socket.on('message', async (message: Buffer) => {
     try {
       const data = JSON.parse(message.toString()) as WebSocketChunkMessage;
 
@@ -160,7 +162,7 @@ export async function transcriptionWebSocket(
             text: finalText,
             id: transcriptionDoc.id,
           };
-          connection.socket.send(JSON.stringify(finalMessage));
+          socket.send(JSON.stringify(finalMessage));
 
           logInfo('Streaming transcription completed', {
             sessionId,
@@ -170,7 +172,7 @@ export async function transcriptionWebSocket(
           });
 
           // Close connection
-          connection.socket.close();
+          socket.close();
         }
       } else {
         logWarn('Unknown message type received', { sessionId, type: data.type });
@@ -183,12 +185,12 @@ export async function transcriptionWebSocket(
         message: 'Failed to process audio chunk',
         code: 'PROCESSING_ERROR',
       };
-      connection.socket.send(JSON.stringify(errorMessage));
+      socket.send(JSON.stringify(errorMessage));
     }
   });
 
   // Handle connection close
-  connection.socket.on('close', () => {
+  socket.on('close', () => {
     isComplete = true;
     const duration = Date.now() - startTime.getTime();
 
@@ -201,7 +203,7 @@ export async function transcriptionWebSocket(
   });
 
   // Handle errors
-  connection.socket.on('error', (error: Error) => {
+  socket.on('error', (error: Error) => {
     isComplete = true;
     logError('WebSocket error', error, { sessionId });
   });
