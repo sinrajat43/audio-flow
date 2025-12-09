@@ -176,6 +176,28 @@ You should get a response with the transcription ID.
 curl http://localhost:3000/transcriptions
 ```
 
+### Test WebSocket (Real-Time Transcription):
+
+Open your browser to:
+
+```
+http://localhost:3000/test-websocket
+```
+
+This provides an interactive visual interface where you can:
+
+- ✅ Connect/disconnect to WebSocket
+- ✅ Send audio chunks with buttons
+- ✅ See real-time transcription results
+- ✅ View detailed logs with timestamps
+- ✅ Test error handling
+
+**Expected Output:**
+
+- Initial welcome message with partial transcription
+- Partial results as you send chunks
+- Final transcription with database ID when `isLast: true`
+
 ## Step 8: Run Tests
 
 Run the test suite to ensure everything is working:
@@ -236,11 +258,11 @@ AudioFlow/
 Now that you have AudioFlow running:
 
 1. **View API Documentation**: Open http://localhost:3000/docs for interactive Swagger UI
-2. **Try the API**: Test all endpoints using curl, Postman, or Swagger UI
-3. **Check the Logs**: Watch the console for detailed logging
-4. **Monitor MongoDB**: View your data in MongoDB Atlas
-5. **Add Azure**: Configure Azure Speech for real transcription
-6. **Test WebSocket**: Try the streaming transcription endpoint
+2. **Test WebSocket**: Open http://localhost:3000/test-websocket for interactive WebSocket testing
+3. **Try the API**: Test all endpoints using curl, Postman, or Swagger UI
+4. **Check the Logs**: Watch the console for detailed logging
+5. **Monitor MongoDB**: View your data in MongoDB Atlas
+6. **Add Azure**: Configure Azure Speech for real transcription
 7. **Learn the Architecture**: See [ARCHITECTURE.md](ARCHITECTURE.md) for design patterns
 8. **Review Implementation**: See [PROJECT_SUMMARY.md](PROJECT_SUMMARY.md) for details
 
@@ -273,6 +295,16 @@ npm run format     # Format code with Prettier
 - [ ] Health check returns 200 OK
 - [ ] Can create mock transcription
 - [ ] Can fetch transcriptions list
+- [ ] WebSocket test page works (`http://localhost:3000/test-websocket`)
 - [ ] Tests pass (`npm test`)
+
+## Useful URLs (When Server is Running)
+
+| Resource                 | URL                                  | Description                        |
+| ------------------------ | ------------------------------------ | ---------------------------------- |
+| 📖 **API Documentation** | http://localhost:3000/docs           | Swagger UI - Interactive API docs  |
+| 🔌 **WebSocket Tester**  | http://localhost:3000/test-websocket | Visual WebSocket testing interface |
+| 🏠 **API Info**          | http://localhost:3000                | API overview and links             |
+| 💚 **Health Check**      | http://localhost:3000/health         | Server health status               |
 
 Congratulations! You're ready to use AudioFlow. 🎉

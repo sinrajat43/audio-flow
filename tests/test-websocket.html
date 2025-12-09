@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AudioFlow WebSocket Test</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 15px 0;
+            font-weight: bold;
+        }
+        .connected {
+            background: #d4edda;
+            color: #155724;
+        }
+        .disconnected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .danger {
+            background: #dc3545;
+        }
+        .danger:hover {
+            background: #c82333;
+        }
+        #log {
+            background: #1e1e1e;
+            color: #dcdcdc;
+            padding: 15px;
+            border-radius: 5px;
+            height: 400px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            margin-top: 20px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .log-entry {
+            margin: 5px 0;
+            padding: 5px 0;
+            border-bottom: 1px solid #333;
+        }
+        .log-success {
+            color: #4ec9b0;
+        }
+        .log-error {
+            color: #f48771;
+        }
+        .log-info {
+            color: #569cd6;
+        }
+        .log-warning {
+            color: #dcdcaa;
+        }
+        .controls {
+            margin: 20px 0;
+        }
+        .input-group {
+            margin: 15px 0;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔌 AudioFlow WebSocket Test</h1>
+        <p>Test the real-time streaming transcription endpoint</p>
+
+        <div id="status" class="status disconnected">
+            ⚫ Disconnected
+        </div>
+
+        <div class="input-group">
+            <label for="wsUrl">WebSocket URL:</label>
+            <input type="text" id="wsUrl" value="ws://localhost:3000/ws/transcription">
+        </div>
+
+        <div class="controls">
+            <button id="connectBtn" onclick="connect()">Connect</button>
+            <button id="disconnectBtn" onclick="disconnect()" disabled>Disconnect</button>
+            <button id="sendChunkBtn" onclick="sendChunk(false)" disabled>Send Chunk</button>
+            <button id="sendFinalBtn" onclick="sendChunk(true)" disabled>Send Final Chunk</button>
+            <button onclick="clearLog()">Clear Log</button>
+        </div>
+
+        <div id="log"></div>
+    </div>
+
+    <script>
+        let ws = null;
+        let chunkCounter = 0;
+
+        function log(message, type = 'info') {
+            const logDiv = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            const entry = document.createElement('div');
+            entry.className = `log-entry log-${type}`;
+            entry.textContent = `[${timestamp}] ${message}`;
+            logDiv.appendChild(entry);
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        function updateStatus(connected) {
+            const statusDiv = document.getElementById('status');
+            const connectBtn = document.getElementById('connectBtn');
+            const disconnectBtn = document.getElementById('disconnectBtn');
+            const sendChunkBtn = document.getElementById('sendChunkBtn');
+            const sendFinalBtn = document.getElementById('sendFinalBtn');
+
+            if (connected) {
+                statusDiv.className = 'status connected';
+                statusDiv.textContent = '🟢 Connected';
+                connectBtn.disabled = true;
+                disconnectBtn.disabled = false;
+                sendChunkBtn.disabled = false;
+                sendFinalBtn.disabled = false;
+            } else {
+                statusDiv.className = 'status disconnected';
+                statusDiv.textContent = '⚫ Disconnected';
+                connectBtn.disabled = false;
+                disconnectBtn.disabled = true;
+                sendChunkBtn.disabled = true;
+                sendFinalBtn.disabled = true;
+            }
+        }
+
+        function connect() {
+            const url = document.getElementById('wsUrl').value;
+            log(`Connecting to ${url}...`, 'info');
+
+            try {
+                ws = new WebSocket(url);
+
+                ws.onopen = () => {
+                    log('✅ Connected successfully!', 'success');
+                    updateStatus(true);
+                    chunkCounter = 0;
+                };
+
+                ws.onmessage = (event) => {
+                    const message = JSON.parse(event.data);
+                    
+                    if (message.type === 'partial') {
+                        log(`🔄 PARTIAL: ${message.text}`, 'info');
+                        log(`   Confidence: ${message.confidence}`, 'info');
+                    } else if (message.type === 'final') {
+                        log(`✅ FINAL: ${message.text}`, 'success');
+                        log(`   ID: ${message.id}`, 'success');
+                    } else if (message.type === 'error') {
+                        log(`❌ ERROR: ${message.message}`, 'error');
+                        log(`   Code: ${message.code}`, 'error');
+                    } else {
+                        log(`📨 Message: ${JSON.stringify(message)}`, 'info');
+                    }
+                };
+
+                ws.onerror = (error) => {
+                    log(`❌ WebSocket error occurred`, 'error');
+                    console.error('WebSocket error:', error);
+                };
+
+                ws.onclose = () => {
+                    log('👋 Connection closed', 'warning');
+                    updateStatus(false);
+                    ws = null;
+                };
+            } catch (error) {
+                log(`❌ Failed to connect: ${error.message}`, 'error');
+            }
+        }
+
+        function disconnect() {
+            if (ws) {
+                log('Closing connection...', 'warning');
+                ws.close();
+            }
+        }
+
+        function sendChunk(isLast) {
+            if (!ws || ws.readyState !== WebSocket.OPEN) {
+                log('❌ Not connected!', 'error');
+                return;
+            }
+
+            chunkCounter++;
+            const chunkData = btoa(`audio-data-${chunkCounter}`);
+            
+            const message = {
+                type: 'chunk',
+                data: chunkData,
+                isLast: isLast
+            };
+
+            log(`📤 Sending ${isLast ? 'FINAL' : ''} chunk #${chunkCounter}`, 'warning');
+            log(`   Data: ${chunkData.substring(0, 50)}...`, 'warning');
+            
+            ws.send(JSON.stringify(message));
+
+            if (isLast) {
+                log('🏁 Final chunk sent, transcription will complete', 'info');
+            }
+        }
+
+        function clearLog() {
+            document.getElementById('log').innerHTML = '';
+        }
+
+        // Initialize
+        updateStatus(false);
+        log('Ready to connect. Click "Connect" button to start.', 'info');
+    </script>
+</body>
+</html>
+

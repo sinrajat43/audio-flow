@@ -8,6 +8,8 @@ import { transcriptionRoutes } from './routes/transcription.routes';
 import { azureTranscriptionRoutes } from './routes/azure-transcription.routes';
 import { transcriptionWebSocket } from './websocket/transcription-stream';
 import { swaggerOptions, swaggerUiOptions } from './config/swagger';
+import * as fs from 'fs';
+import * as path from 'path';
 
 /**
  * Creates and configures the Fastify application
@@ -89,6 +91,7 @@ export async function createApp(): Promise<FastifyInstance> {
         version: '1.0.0',
         description: 'Audio transcription service with mock and Azure Speech-to-Text integration',
         documentation: '/docs',
+        websocketTest: '/test-websocket',
         endpoints: {
           health: 'GET /health',
           mockTranscription: 'POST /transcription',
@@ -97,6 +100,26 @@ export async function createApp(): Promise<FastifyInstance> {
           websocket: 'WS /ws/transcription',
         },
       };
+    },
+  );
+
+  // WebSocket test page
+  app.get(
+    '/test-websocket',
+    {
+      schema: {
+        hide: true, // Hide from Swagger docs
+      },
+    },
+    async (_request, reply) => {
+      const htmlPath = path.join(process.cwd(), 'tests', 'test-websocket.html');
+      
+      if (fs.existsSync(htmlPath)) {
+        const html = fs.readFileSync(htmlPath, 'utf-8');
+        reply.type('text/html').send(html);
+      } else {
+        reply.code(404).send({ error: 'Test page not found' });
+      }
     },
   );
 
